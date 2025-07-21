@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-// import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@/generated/prisma';
 
 export async function POST(req: NextRequest, res: NextResponse) {
     const { username, password, confirmPassword } = await req.json();
@@ -12,18 +12,17 @@ export async function POST(req: NextRequest, res: NextResponse) {
         return NextResponse.json({ error: 'As senhas não coincidem.' }, { status: 400 });
     }
 
-    // try {
-    //     const prisma = new PrismaClient();
+    try {
+        const prisma = new PrismaClient();
     
-    //     const user = await prisma.user.create({
-    //         data: { username, password }
-    //     });
+        const user = await prisma.user.create({
+            data: { username, password }
+        });
 
-    //     return NextResponse.json({ user: user });
-    // } catch (error) {
-    //     console.error("Erro ao criar usuário:", error);
-    //     return NextResponse.json({ error: 'Erro ao criar usuário.' }, { status: 500 });
-    // }
-
-    return NextResponse.json({ username }, { status: 201 });
+        return NextResponse.json({ user: user });
+    } catch (error) {
+        console.error("Erro ao criar usuário:", error);
+        return NextResponse.json({ error: 'Erro ao criar usuário.' }, { status: 500 });
+    }
 }
+
