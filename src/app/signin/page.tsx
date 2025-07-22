@@ -1,22 +1,44 @@
 "use client"
 
-import { FormEvent, useEffect } from "react"
+import { ChangeEvent, FormEvent, useEffect, useState } from "react"
+import {useRouter} from "next/navigation"
+
+interface IFormData {
+    username: string;
+    password: string;
+}
 
 export default function signin() {
+    const [formData, setFormData] = useState<IFormData>({
+        username: "",
+        password: ""
+    });
+    const router = useRouter();
 
     useEffect(()=>{
       prompt("Set your google ai api key: ");
     }, [])
 
+    function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
+        const { name, value } = event.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    }
+
     function handleSignin(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
 
+        console.log({formData})
         // Encriptar senha antes de enviar
-        fetch("/api/account/create", {
+        fetch("/api/auth", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ user: "", password: "" })
-        });
+            body: JSON.stringify({ username: formData.username, password: formData.password })
+        }).then(async response => {
+            if (!response.ok) {alert("Erro ao fazer login"); return; }
+            const {token} = await response.json();
+            localStorage.setItem("token", token);
+            router.push("/home")
+        })
     }
 
     return (
@@ -26,11 +48,17 @@ export default function signin() {
                 Login
             </h1>
             <input
+                name="username"
+                value={formData.username}
+                onChange={handleInputChange}
                 type="text"
                 placeholder="Usuário"
                 className="w-full p-[20px] text-[#5C946E] border border-[#5C946E] rounded-none focus:outline-none focus:border-[#104547]"
             />
             <input
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
                 type="password"
                 placeholder="Senha"
                 className="w-full p-[20px] text-[#5C946E] border border-[#5C946E] rounded-none focus:outline-none focus:border-[#104547]"

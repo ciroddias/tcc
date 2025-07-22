@@ -34,6 +34,7 @@ export default function Signup(){
         return;
       }
 
+      // encriptar password
       fetch('/api/account/create', {
         method: 'POST',
         headers: {
