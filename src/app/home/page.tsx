@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface IMessage {
   text: string;
@@ -9,12 +9,28 @@ interface IMessage {
 }
 
 export default function Home() {
+  const [token, setToken] = useState<string | null>(null);
   const router = useRouter();
   const [currentMessage, setCurrentMessage] = useState("");
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [suggestions, setSuggestions] = useState<string[]>([
     "O que é taxa selic?", "O que são juros compostos?", "Qual é o investimento mais seguro do Brasil?"
   ])
+
+  useEffect(() => {
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        router.push("/signin");
+        return;
+      }
+
+      setToken(token);
+    } catch (error) {
+      router.push("/signin");
+    }
+  }, []);
 
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
     const { value } = event.target;
@@ -23,8 +39,7 @@ export default function Home() {
 
   async function handleSendMessage(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    
-    const token = localStorage.getItem("token");
+
     
     if (!token) {
       alert("Você precisa estar logado para enviar mensagens.");

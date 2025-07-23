@@ -27,7 +27,6 @@ export default function signin() {
     function handleSignin(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
 
-        console.log({formData})
         // Encriptar senha antes de enviar
         fetch("/api/auth", {
             method: "POST",

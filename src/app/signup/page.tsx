@@ -34,6 +34,11 @@ export default function Signup(){
         return;
       }
 
+      if (password !== confirmPassword) {
+        alert("As senhas não coincidem.");
+        return;
+      }
+
       // encriptar password
       fetch('/api/account/create', {
         method: 'POST',
