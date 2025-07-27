@@ -9,6 +9,8 @@ interface IMessage {
 }
 
 export default function Home() {
+  const [chatId, setChatId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [token, setToken] = useState<string | null>(null);
   const router = useRouter();
   const [currentMessage, setCurrentMessage] = useState("");
@@ -39,7 +41,6 @@ export default function Home() {
 
   async function handleSendMessage(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
     
     if (!token) {
       alert("Você precisa estar logado para enviar mensagens.");
@@ -47,14 +48,16 @@ export default function Home() {
     }
     
     setMessages(prev => [...prev, { text: currentMessage, role: "user" }]);
-    const { message } = await fetch('/api/chats/message/send', {
+    setIsLoading(true)
+    const { message, chatId: newChatId } = await fetch('/api/chats/message/send', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ message: currentMessage}),
+      body: JSON.stringify({ chatId, message: currentMessage}),
     }).then(response => {
+      setIsLoading(false)
       if (!response.ok) {
         alert("Erro ao enviar mensagem");
         return;
@@ -62,6 +65,10 @@ export default function Home() {
       setCurrentMessage("");
       return response.json();
     })
+    if (newChatId) {
+      setChatId(newChatId);
+    }
+
     setMessages(prev => [...prev, { text: message, role: "assistant" }]);
   }
 
@@ -77,6 +84,12 @@ export default function Home() {
         </span>
         : messages.map((msg, i) => (
           <Message text={msg.text} role={msg.role} key={i} />  ))}
+        {isLoading && (
+          <div className="flex justify-start gap-3 items-center mb-4">
+            <div className="w-8 h-8 bg-[#5C946E] rounded-full animate-pulse" />
+            <p className="text-sm text-[#104547]">Digitando...</p>
+          </div>
+        )}
       </div>
 
       <div className="mb-2">

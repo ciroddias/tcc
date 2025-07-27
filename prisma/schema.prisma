@@ -18,5 +18,26 @@ model User {
   id       Int    @id @default(autoincrement())
   username    String @unique
   password String
+  chats   Chat[]
 }
 
+model Chat {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  messages  Message[]
+}
+
+enum Role {
+  user
+  assistant
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  chatId    Int
+  chat      Chat     @relation(fields: [chatId], references: [id])
+  text      String
+  role      Role
+  createdAt DateTime @default(now())
+}
