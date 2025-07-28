@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
 
 interface IMessage {
   text: string;
@@ -18,6 +19,8 @@ export default function Home() {
   const [suggestions, setSuggestions] = useState<string[]>([
     "O que é taxa selic?", "O que são juros compostos?", "Qual é o investimento mais seguro do Brasil?"
   ])
+
+  // Recuperar mensagens do chatId se existir;
 
   useEffect(() => {
     try {
@@ -86,7 +89,7 @@ export default function Home() {
           <Message text={msg.text} role={msg.role} key={i} />  ))}
         {isLoading && (
           <div className="flex justify-start gap-3 items-center mb-4">
-            <div className="w-8 h-8 bg-[#5C946E] rounded-full animate-pulse" />
+            <div className="w-4 h-4 bg-[#5C946E] rounded-full animate-pulse" />
             <p className="text-sm text-[#104547]">Digitando...</p>
           </div>
         )}
@@ -119,11 +122,12 @@ interface IMessageProps {
 }
 
 function Message({text, role}: IMessageProps) {
-  console.log(text, role)
   return (
     <div className={`flex ${role === "user" ? "justify-start flex-row-reverse" : "justify-start"} gap-3 items-center mb-4`}>
       {/* <div className={`w-8 h-8 ${role === "user" ? "bg-[#104547]":"bg-[#5C946E]"} rounded-full`} /> */}
-        <p className="text-sm text-[#104547]">{text}</p>
+      <div className="text-sm text-[#104547]">
+        <ReactMarkdown>{text}</ReactMarkdown>
+      </div>
     </div>
   );
 }

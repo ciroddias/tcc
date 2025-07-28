@@ -14,7 +14,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const token = authHeader.split(' ')[1]
     const decoded = verifyToken(token)
 
-    if (!decoded || typeof decoded === 'string' || !('id' in decoded)) {
+    if (!decoded || typeof decoded === 'string') {
         return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     if (!chatId) {
         newChat = await prisma.chat.create({
             data: {
-                userId: decoded.id,
+                userId: decoded.user.id,
                 messages: {
                     create: {
                         text: message,
